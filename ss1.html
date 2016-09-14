@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <style>
+           body{
+            height: 500px;
+           }
+        </style>
+    </head>
+    <body>
+        <div id="box" >
+            <input type="button" value="按钮1" id="btn1"  />
+        </div>
+        <script>
+             function fade(element){
+                var level = 0;
+                var step = function(){
+                    
+                    var hex = level.toString(16);
+                    //if(!element)return;
+
+                    element.style.background = '#ffff'+hex+hex;
+                    //console.log('#fff'+hex+hex)
+                    if(level<16){
+                        level++;
+                        setTimeout(step,100);
+                    }
+                }
+                step();
+             }
+             fade(document.body);
+            
+            //在函数上添加一方法接口
+             Function.prototype.methods = function(name,fn){
+                if(!this.prototype[name]){
+                    this.prototype[name] = fn;
+                    return this;
+                }
+             }
+
+             //用于将转译的html元素转译回去
+             String.methods('deen',function(){
+                var entity = {
+                    quot:'"',
+                    lt:"<",
+                    gt:">"
+                }
+                return function(){
+                    return this.replace(/&([^&;]+);/g,function(a,b){
+                        var r = entity[b];
+                        return typeof r ==='string' ? r :a;
+                    });
+                }
+             }());
+
+             //这样可以让seq和prefix成为私有的变量；让外界的对象无法获取和修改
+             function make_serial(){
+                var seq = 0;
+                var prefix = '';
+                return {
+                    set_seq:function(n){
+                        seq = n;
+                    },
+                    set_fix:function(s){
+                        prefix = String(s);
+                    },
+                    get_seq:function(){
+                        var result = prefix+seq;
+                        seq++;
+                        return result;
+                    }
+                }
+             }
+            
+             //这样的构造会让seq和prefix这两个变量暴露在外面，容易被外面的对象访问和修改
+                function Make_serial(){
+                this.seq = 0;
+                this.prefix = '';
+                }
+                Make_serial.prototype.set_seq = function(n){
+                    this.seq = n;
+                }
+                Make_serial.prototype.set_fix = function(s){
+                        this.prefix = String(s);
+                    }
+                Make_serial.prototype.get_seq = function(){
+                        var result = this.prefix+this.seq;
+                        this.seq++;
+                        return result;
+                    }
+             
+             var seq_make = make_serial();
+             seq_make.set_seq(200);
+             seq_make.set_fix('Q');
+             console.log(seq_make.get_seq())
+             console.log(seq_make.seq)  //undefined
+             var seq_make1 = new Make_serial();
+             seq_make1.set_seq(300);
+             seq_make1.seq = 500
+             seq_make1.set_fix('f');
+             console.log(seq_make1.get_seq())
+             console.log(seq_make1.seq) //501
+             // console.log(Make_serial.seq)
+             //联级
+             function People(name,age,height){
+                var _this = this;
+                this.name = name || 'jason';
+                this.age = age || 25;
+                this.height = height || 178;
+                function prative(){
+                    _this.age = '**';
+                }
+                this.getInfo = function(){
+                    prative();
+                    return this.name+'|'+this.age+'|'+this.height;
+                }
+             }
+             People.prototype.getName = function(){
+                return this.name;
+             }
+             People.prototype.setAge = function(age){
+                this.age = age;
+                return this;
+             }
+              People.prototype.getAge = function(){
+                return this.age;
+             }
+             var people = new People('wu',21,165);
+             //people.prative();//people.prative is not a function
+             console.log(people.getInfo());
+             people.setAge(26)
+             .getAge() //实现联级
+
+             //套用
+             var foo = {
+                0:'hello',
+                1:'world',
+                length:2,
+                slice:Array.prototype.slice,
+                push:Array.prototype.push
+             }
+             console.log(foo.slice())
+             foo.push('china')//foo的length也会自动累加一
+             console.log(foo.length)
+              console.log(foo.slice());
+              console.log(foo)
+              var dd = Array.prototype.slice.call(foo,2);//or  Array.prototype.slice.apply(foo,[2])
+              console.log(dd) //china
+
+              //记忆
+              var num = 0,num1 = 0,num2 = 0,num3 = 0;
+              function sum(n){
+                num++;
+                return n<2?n:sum(n-1)+sum(n-2);
+              }
+              for(var i =0;i<=10;i++){
+                num1++;
+                console.log(i,sum(i));
+              }
+             console.log(num,num1)
+             //上面的求和被不断的调用自身，过多的去计算之前已经计算过的值；造成浪费；我们在这进行改进让其具有记忆之前已经计算的值
+             //如果有的话就直接读取过来，否则就进行计算调用自身
+             var sum_parent = function (n){
+                var temp = [0,1];
+                var num =  function (n){
+                    var result = temp[n];
+                    if(typeof result!=='number'){
+                        result = num(n-1)+num(n-2);
+                        temp[n] = result;
+                    }
+                    return result;
+                }
+                return num;
+             }();
+
+               for(var i =0;i<=10;i++){
+                console.log(i,sum_parent(i));
+              }
+              console.log(num3,num2)
+              //封装递归
+
+              var recursion = function(meom,fn){
+                var shell = function(n){
+                    var result = meom[n];
+                    if(typeof result!=='number'){
+                        result = fn(shell,n);
+                        meom[n] = result;
+                    }
+                    return result;                   
+                }
+                return shell;
+              }
+              var demo = recursion([1,1],function(shells,n){
+                return n*shells(n-1);
+              });
+              for(var j=0;j<10;j++){
+                console.log(j,demo(j));
+              }
+              //函数继承
+              console.log(Function.methods)
+        </script>
+    </body>
+</html>
