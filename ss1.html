@@ -199,7 +199,10 @@
                 console.log(j,demo(j));
               }
               //函数继承
-              console.log(Function.methods)
+              Function.methods('innhert',function(parent){
+                this.prototype = new parent();
+                return this;
+              })
         </script>
     </body>
 </html>
