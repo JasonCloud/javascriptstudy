@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>css3轮播</title>
+	<style type="text/css">
+     #lunbo{
+    width: 800px;
+    height: 380px;
+    /*background: url(imgs/lunbo1.jpg);*/
+    animation: 20s lunbo ease-in infinite;
+    background-repeat: no-repeat;
+    background-size: cover;
+     }
+@keyframes lunbo{
+    0%{background-image: url(imgs/lunbo1.png);}
+    20%{background-image: url(imgs/lunbo2.png);}
+    40%{background-image: url(imgs/lunbo3.png);}
+    60%{background-image: url(imgs/lunbo4.png);}
+    80%{background-image: url(imgs/lunbo5.png);}
+    100%{background-image: url(imgs/lunbo1.png);}
+}
+	</style>
+</head>
+<body>
+	<div id="lunbo">
+		
+	</div>
+</body>
+</html>

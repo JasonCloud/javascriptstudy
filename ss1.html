@@ -203,6 +203,50 @@
                 this.prototype = new parent();
                 return this;
               })
+
+
+              //原型继承
+              //简单的原型继承
+              var BaseCalculator = function (){
+                this.calc = 5;
+              }
+              BaseCalculator.prototype = function(){
+                var add = function(x,y){
+                    return x + y;
+                },
+                cha = function(x,y){
+                    return x - y;
+                }
+                return {
+                    add: add,
+                    cha: cha
+                }
+              }();
+              var newCal = function(){
+                this.tax = 3;
+              }
+              newCal.prototype = new BaseCalculator();//这样的话newCal的实例能够访问到BaseCalculator中
+                                                      //的calc值因为它执行BaseCalculator的实例
+              newCal.prototype.df = '我是原型上的';
+              var eg = new newCal();
+              console.log(eg.calc)
+              newCal.prototype.add = function(x,y){ //重写了add方法
+                return 'x+y';
+              }
+              console.log(eg.add(1,1),eg.tax);
+               console.log(eg.hasOwnProperty('calc'))
+              console.log(eg.hasOwnProperty('df'),eg.df)
+              var otherCal = function(){
+                this.tax = 7;
+                var private_ = 5;
+              }
+              otherCal.prototype = BaseCalculator.prototype;
+              var newOthercal = new otherCal();
+              console.log(newOthercal.calc); //返回undefined因为它的原型只是另一个构造器的原型不是他的实例，所以无法访问到calc
+              console.log(newOthercal.private_) //undefined 因为private_是私有的
+              console.log(newOthercal.hasOwnProperty('tax'));
+
         </script>
     </body>
 </html>
+   
